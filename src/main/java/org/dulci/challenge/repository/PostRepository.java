@@ -7,18 +7,18 @@ import io.vertx.sqlclient.Tuple;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import javax.inject.Inject;
 import org.dulci.challenge.model.Resource;
 
 public class PostRepository {
 
-    private static final Logger LOGGER = Logger.getLogger(PostRepository.class.getName());
     private final PgPool client;
 
-    private PostRepository(PgPool _client) {
-        this.client = _client;
+    @Inject
+    public PostRepository(PgPool pgPool) {
+        this.client = pgPool;
     }
 
     //factory method
@@ -32,18 +32,37 @@ public class PostRepository {
             row.getString("text")
         );
 
+    /**
+     * Method to get a list of resources in DB.
+     * @return Feature Set list of all words saved in resource table.
+     */
     public Future<Set<Resource>> findAll() {
         return client.query("SELECT * FROM resource ORDER BY id ASC")
             .execute()
-            .map(rs -> StreamSupport.stream(rs.spliterator(), false)
-                .map(MAPPER)
-                .collect(Collectors.toSet())
-            );
+            .compose(rs -> {
+                Set<Resource> resources = StreamSupport.stream(rs.spliterator(), false)
+                    .map(MAPPER)
+                    .collect(Collectors.toSet());
+                return Future.succeededFuture(resources);
+            })
+            .onFailure(Throwable::printStackTrace);
     }
 
+    /**
+     * Method to save in a DB a new word in table resource.
+     * @param data  Resource object with the request data.
+     * @return Feature value of UUID get from DB.
+     */
     public Future<UUID> save(Resource data) {
-        return client.preparedQuery("INSERT INTO resource(text) VALUES ($1) RETURNING (id)").execute(Tuple.of(data.getText()))
-            .map(rs -> rs.iterator().next().getUUID("id"));
+        Tuple params = Tuple.of(data.getUuid(), data.getText());
+        return client.preparedQuery("INSERT INTO resource (id, text) VALUES ($1, $2) RETURNING id")
+            .execute(params)
+            .compose(result -> {
+                Row row = result.iterator().next();
+                UUID savedId = row.getUUID("id");
+                return Future.succeededFuture(savedId);
+            })
+            .onFailure(Throwable::printStackTrace);
     }
 
 

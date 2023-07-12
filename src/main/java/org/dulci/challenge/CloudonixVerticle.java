@@ -4,20 +4,18 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.pgclient.PgPool;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import org.dulci.challenge.handler.PostsHandler;
-import org.dulci.challenge.repository.PostRepository;
 import org.dulci.challenge.utils.CloudonixConstants;
 
-public class CloudonixVerticle  extends AbstractVerticle {
+public class CloudonixVerticle extends AbstractVerticle {
     private static final Logger LOGGER = Logger.getLogger(CloudonixVerticle.class.getName());
-    private final PgPool pgPool;
+    private final PostsHandler postsHandler;
 
     @Inject
-    public CloudonixVerticle(PgPool pgPool) {
-        this.pgPool = pgPool;
+    public CloudonixVerticle(PostsHandler postsHandler) {
+        this.postsHandler = postsHandler;
     }
 
     @Override
@@ -25,9 +23,7 @@ public class CloudonixVerticle  extends AbstractVerticle {
 
         LOGGER.info("Starting HTTP server...");
         //Create a PgPool instance
-        PostRepository postRepository = PostRepository.create(pgPool);
-        final PostsHandler postHandlers = PostsHandler.create(postRepository);
-        final Router router = routes(postHandlers);
+        final Router router = routes(postsHandler);
 
         vertx.createHttpServer().requestHandler(router).listen(CloudonixConstants.HTTP_PORT);
 

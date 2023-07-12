@@ -1,4 +1,4 @@
 CREATE TABLE IF NOT EXISTS resource (
-                                        ID         SERIAL PRIMARY KEY,
-                                        TEXT       VARCHAR(20) NOT NULL
+                                        id varchar(36) NOT NULL,
+                                        text       VARCHAR(20) NOT NULL
 );
