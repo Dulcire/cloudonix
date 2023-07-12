@@ -13,7 +13,6 @@ import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.PoolOptions;
 import io.vertx.sqlclient.SqlClient;
-import java.util.logging.Logger;
 import javax.sql.DataSource;
 import org.apache.maven.model.Repository;
 import org.flywaydb.core.Flyway;
@@ -33,14 +32,11 @@ import static org.dulci.challenge.utils.CloudonixConstants.DB_USER;
 public class CloudonixService {
 
     private static PgPool getPgPool(Vertx vertx, JsonObject config) {
-        PgConnectOptions connectOptions = PgConnectOptions.fromUri(DB_URL);
-        connectOptions.setUser(DB_USER);
-        connectOptions.setPassword(DB_PASSWORD);
-        return PgPool.pool(vertx, connectOptions, new PoolOptions().setMaxSize(20));
-    }
+        PgConnectOptions connectOptions = PgConnectOptions.fromUri(config.getString(DB_URL));
 
-    private static ConfigRetriever getConfigRetriever(Vertx vertx) {
-        return ConfigRetriever.create(vertx);
+        connectOptions.setUser(config.getString(DB_USER));
+        connectOptions.setPassword(config.getString(DB_PASSWORD));
+        return PgPool.pool(vertx, connectOptions, new PoolOptions().setMaxSize(20));
     }
 
     private static void runDbMigrations(DataSource dataSource) {
@@ -50,7 +46,8 @@ public class CloudonixService {
             .load()
             .migrate();
     }
-        private static Injector setupDependencies(Vertx vertx,
+
+    private static Injector setupDependencies(Vertx vertx,
                                               JsonObject config,
                                               Configuration dbConfig) {
         return Guice.createInjector(new AbstractModule() {
@@ -66,11 +63,19 @@ public class CloudonixService {
         });
     }
 
+    private static ConfigRetriever getConfigRetriever(Vertx vertx) {
+        var config = new ConfigStoreOptions()
+            .setType("file")
+            .setFormat("properties")
+            .setConfig(new JsonObject().put("path", "application.properties"));
+        return ConfigRetriever.create(vertx, new ConfigRetrieverOptions().addStore(config));
+    }
+
     private static Configuration setupDatabase(JsonObject config) {
         var dataSource = new PGSimpleDataSource();
-        dataSource.setUrl("jdbc:"+DB_URL);
-        dataSource.setUser(DB_USER);
-        dataSource.setPassword(DB_PASSWORD);
+        dataSource.setUrl("jdbc:" + config.getString(DB_URL));
+        dataSource.setUser(config.getString(DB_USER));
+        dataSource.setPassword(config.getString(DB_PASSWORD));
         var defaultConfiguration = new DefaultConfiguration();
         defaultConfiguration.set(new DataSourceConnectionProvider(dataSource));
         defaultConfiguration.set(SQLDialect.POSTGRES);
@@ -78,6 +83,7 @@ public class CloudonixService {
         runDbMigrations(dataSource);
         return defaultConfiguration;
     }
+
 
     public static void main(String[] args) {
         Vertx vertx = Vertx.vertx();

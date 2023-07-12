@@ -21,7 +21,7 @@
     <vertx.version>4.4.4</vertx.version>
     <junit-jupiter.version>5.9.1</junit-jupiter.version>
 
-    <main.verticle>com.dulce.vertx.base.starter.MainVerticle</main.verticle>
+    <main.verticle>com.dulce.vertx.base.starter.CloudonixService</main.verticle>
     <launcher.class>io.vertx.core.Launcher</launcher.class>
     <lombok.version>1.18.28</lombok.version>
 
@@ -39,12 +39,6 @@
   </properties>
 
   <dependencies>
-
-    <dependency>
-      <groupId>com.github.ben-manes.caffeine</groupId>
-      <artifactId>caffeine</artifactId>
-      <version>3.0.0</version>
-    </dependency>
 
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -195,6 +189,21 @@
             <argument>${main.verticle}</argument>
           </arguments>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <mainClass>org.dulci.challenge.CloudonixService</mainClass>
+          <layout>JAR</layout>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

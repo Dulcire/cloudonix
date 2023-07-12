@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+
+  cloudonix-challenge:
+    image: cloudonix-challenge:latest
+    networks:
+      - cloudonix-challenge
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: curl --fail http://cloudonix-challenge:8080/actuator/health
+      interval: 60s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  postgresql-service:
+    image: postgres
+    networks:
+      - cloudonix-challenge
+    environment:
+      - POSTGRES_PASSWORD=Cl0udon!x
+      - POSTGRES_USER=cloudonix
+      - POSTGRESQL_DATABASE=cloudonix
+    ports:
+      - 5432:5432
+    restart: on-failure
+
+networks:
+  cloudonix-challenge:
+    name: cloudonix-challenge_net
