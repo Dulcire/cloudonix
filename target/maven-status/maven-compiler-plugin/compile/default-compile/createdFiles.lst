@@ -1,0 +1,11 @@
+org\dulci\challenge\CloudonixVerticle.class
+org\dulci\challenge\utils\CloudonixConstants.class
+org\dulci\challenge\model\Resource.class
+org\dulci\challenge\CloudonixService$1.class
+org\dulci\challenge\CloudonixService.class
+org\dulci\challenge\handler\PostsHandler.class
+org\dulci\challenge\model\Response$ResponseBuilder.class
+org\dulci\challenge\utils\UtilHelper.class
+org\dulci\challenge\model\Response.class
+org\dulci\challenge\repository\PostRepository.class
+org\dulci\challenge\model\Resource$ResourceBuilder.class

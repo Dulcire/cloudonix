@@ -1,0 +1,194 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.dulci</groupId>
+  <artifactId>cloudonix-challenge</artifactId>
+  <version>0.0.1</version>
+  <packaging>jar</packaging>
+
+  <name>cloudonix-challenge</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+    <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
+    <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+    <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
+
+    <vertx.version>4.4.4</vertx.version>
+    <junit-jupiter.version>5.9.1</junit-jupiter.version>
+
+    <main.verticle>com.dulce.vertx.base.starter.MainVerticle</main.verticle>
+    <launcher.class>io.vertx.core.Launcher</launcher.class>
+    <lombok.version>1.18.28</lombok.version>
+
+    <jooq-codegen-maven.version>3.18.0</jooq-codegen-maven.version>
+    <vertx-jooq-generate.version>6.1.1</vertx-jooq-generate.version>
+
+    <!-- Flyaway -->
+    <flyway.version>9.20.0</flyway.version>
+    <flyway.url>databaseUrl</flyway.url>
+    <flyway.user>databaseUser</flyway.user>
+    <flyway.password>databasePassword</flyway.password>
+    <flyway.schemas>schemaName</flyway.schemas>
+    <flyway.locations>schemaName</flyway.locations>
+    <postgresql.version>42.6.0</postgresql.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-web</artifactId>
+      <version>${vertx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-config</artifactId>
+      <version>${vertx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.ongres.scram</groupId>
+      <artifactId>client</artifactId>
+      <version>2.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-pg-client</artifactId>
+      <version>${vertx.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-sql-client</artifactId>
+      <version>${vertx.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.15.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <version>${flyway.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${postgresql.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq-codegen-maven</artifactId>
+      <version>${jooq-codegen-maven.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq-meta-extensions</artifactId>
+      <version>${jooq-codegen-maven.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.jklingsporn</groupId>
+      <artifactId>vertx-jooq-classic-reactive</artifactId>
+      <version>${vertx-jooq-generate.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-maven-plugin</artifactId>
+        <version>${flyway.version}</version>
+        <configuration>
+          <sqlMigrationSeparator>__</sqlMigrationSeparator>
+          <locations>
+            <location>filesystem:src/main/resources/db/migration</location>
+          </locations>
+          <url>${flyway.url}</url>
+          <user>${flyway.user}</user>
+          <password>${flyway.password}</password>
+          <schemas>
+            <schema>vertxbroker</schema>
+          </schemas>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <release>11</release>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>${maven-shade-plugin.version}</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer
+                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <manifestEntries>
+                    <Main-Class>${launcher.class}</Main-Class>
+                    <Main-Verticle>${main.verticle}</Main-Verticle>
+                  </manifestEntries>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+              </transformers>
+              <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-fat.jar
+              </outputFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven-surefire-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>${exec-maven-plugin.version}</version>
+        <configuration>
+          <mainClass>io.vertx.core.Launcher</mainClass>
+          <arguments>
+            <argument>run</argument>
+            <argument>${main.verticle}</argument>
+          </arguments>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

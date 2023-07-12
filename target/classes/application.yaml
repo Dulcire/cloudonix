@@ -1,0 +1,16 @@
+# database
+db:
+  driver-class-name: org.postgresql.Driver
+  url: ${DB_URL}
+  user: ${DB_USER:adminUser}
+  password: ${DB_PASS:Cl0udon!x}
+  pool:
+    max: 20
+
+flyway:
+  user: ${DB_USER:cloudonix}
+  password: ${DB_PASS:Cl0udon!x}
+  schemas: ${DB_NAME:cloudonix}
+  url: jdbc:postgresql://localhost:5455/cloudonix
+  locations: classpath:db/migrations
+  baseline-on-migrate: true
