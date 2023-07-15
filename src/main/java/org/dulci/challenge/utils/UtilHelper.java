@@ -51,7 +51,7 @@ public class UtilHelper {
      * @param word word to be calculated.
      * @return total value of the word
      */
-    private static int calculateTotalCharacterValue(String word) {
+    private static int calculateTotalCharacterValue(final String word) {
         int totalValue = 0;
         for (char c : word.toCharArray()) {
             totalValue += Character.toLowerCase(c) - 'a' + 1;

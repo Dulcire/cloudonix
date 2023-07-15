@@ -26,8 +26,8 @@
     <lombok.version>1.18.28</lombok.version>
 
     <jooq-codegen-maven.version>3.18.0</jooq-codegen-maven.version>
-    <vertx-jooq-generate.version>6.1.1</vertx-jooq-generate.version>
-
+    <vertx-jooq-generate.version>6.5.5</vertx-jooq-generate.version>
+    <reactiverse-junit5-web-client.version>0.3.0</reactiverse-junit5-web-client.version>
     <!-- Flyaway -->
     <flyway.version>9.20.0</flyway.version>
     <flyway.url>databaseUrl</flyway.url>
@@ -108,11 +108,32 @@
     </dependency>
 
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>5.9.2</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>io.reactiverse</groupId>
+      <artifactId>reactiverse-junit5-web-client</artifactId>
+      <version>${reactiverse-junit5-web-client.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>3.12.4</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-junit5</artifactId>
+      <version>4.4.4</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -130,7 +151,7 @@
           <user>${flyway.user}</user>
           <password>${flyway.password}</password>
           <schemas>
-            <schema>vertxbroker</schema>
+            <schema>vertx-broker</schema>
           </schemas>
         </configuration>
         <dependencies>

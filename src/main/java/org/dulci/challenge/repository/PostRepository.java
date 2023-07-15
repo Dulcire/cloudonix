@@ -17,12 +17,12 @@ public class PostRepository {
     private final PgPool client;
 
     @Inject
-    public PostRepository(PgPool pgPool) {
+    public PostRepository(final PgPool pgPool) {
         this.client = pgPool;
     }
 
     //factory method
-    public static PostRepository create(PgPool client) {
+    public static PostRepository create(final PgPool client) {
         return new PostRepository(client);
     }
 
@@ -53,8 +53,8 @@ public class PostRepository {
      * @param data  Resource object with the request data.
      * @return Feature value of UUID get from DB.
      */
-    public Future<UUID> save(Resource data) {
-        Tuple params = Tuple.of(data.getUuid(), data.getText());
+    public Future<UUID> save(final Resource data) {
+        final Tuple params = Tuple.of(data.getUuid(), data.getText());
         return client.preparedQuery("INSERT INTO resource (id, text) VALUES ($1, $2) RETURNING id")
             .execute(params)
             .compose(result -> {

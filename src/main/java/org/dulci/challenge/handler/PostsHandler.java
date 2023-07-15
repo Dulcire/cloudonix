@@ -2,6 +2,7 @@ package org.dulci.challenge.handler;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -29,7 +30,7 @@ public class PostsHandler {
      * Method to get a value and lexical calculation of a word sent as a request. And save this new word in BD.
      * @param routingContext routingContext.
      */
-    public void createResource(final RoutingContext routingContext) {
+    public void evaluateWord(final RoutingContext routingContext) {
         LOGGER.info("Getting word from request.");
         final Resource resource = routingContext.body().asJsonObject().mapTo(Resource.class);
         LOGGER.info("Getting wordlist from .");
@@ -37,6 +38,7 @@ public class PostsHandler {
         wordlistDB.onComplete(asyncResult -> {
             if (asyncResult.succeeded()) {
                 final Set<String> wordList = getWordList(asyncResult);
+                wordList.remove(resource.getText());
                 LOGGER.info("Preparing response to be sent.");
                 final JsonObject responseJson = prepareResponse(resource, wordList);
                 if (!wordList.contains(resource.getText())) {
@@ -62,7 +64,7 @@ public class PostsHandler {
      */
     private void saveResourceAndHandleResponse(Resource resource, JsonObject responseJson, RoutingContext routingContext) {
         LOGGER.info("Saving data in DB....");
-        this.posts.save(Resource.builder().uuid(UUID.randomUUID().toString()).text(resource.getText()).build())
+            this.posts.save(Resource.builder().uuid(UUID.randomUUID().toString()).text(resource.getText()).build())
             .onSuccess(savedId -> {
                 sendSuccessResponse(responseJson, routingContext);
             })
@@ -82,7 +84,8 @@ public class PostsHandler {
         LOGGER.info("sending response back.");
         final HttpServerResponse response = routingContext.response();
         response.putHeader("Content-Type", "application/json");
-        response.setStatusCode(200).end(responseJson.encode());
+        response.setStatusCode(200);
+        response.end(responseJson.encode());
     }
 
     /**

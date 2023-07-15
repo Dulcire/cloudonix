@@ -1,4 +1,4 @@
-package org.dulci.challenge;
+package org.dulci.challenge.verticle;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
@@ -45,7 +45,7 @@ public class CloudonixVerticle extends AbstractVerticle {
     private Router routes(final PostsHandler handlers) {
         // Create a Router
         final Router router = Router.router(vertx);
-        router.post(CloudonixConstants.BASE_URL).consumes("application/json").handler(BodyHandler.create()).handler(handlers::createResource);
+        router.post(CloudonixConstants.BASE_URL).consumes("application/json").handler(BodyHandler.create()).handler(handlers::evaluateWord);
         return router;
     }
 }
